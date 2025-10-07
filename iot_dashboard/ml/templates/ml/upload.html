@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Upload Model</title>
+    <style>
+      /* Basic styling for the entire page */
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          "Helvetica Neue", Arial, sans-serif;
+        background-color: #f4f7f6;
+        color: #333;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+      }
+
+      /* Container for the card */
+      .container {
+        max-width: 500px;
+        width: 90%;
+        padding: 20px;
+      }
+
+      /* Styling for the main card container */
+      .card {
+        background-color: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        padding: 40px;
+        text-align: center;
+      }
+
+      /* Heading style */
+      h1 {
+        font-size: 2em;
+        color: #2c3e50;
+        margin-bottom: 30px;
+      }
+
+      /* Form group styling for spacing */
+      .form-group {
+        margin-bottom: 20px;
+      }
+
+      /* Styling for the horizontal rule */
+      hr {
+        border: 0;
+        height: 1px;
+        background: #dfe4e7;
+        margin: 40px 0;
+      }
+
+      /* Button styles */
+      .btn {
+        background-color: #3498db;
+        color: white;
+        padding: 12px 24px;
+        border: none;
+        border-radius: 6px;
+        font-size: 1em;
+        cursor: pointer;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+        width: 100%;
+      }
+
+      /* Hover and active effects for buttons */
+      .btn:hover {
+        background-color: #2980b9;
+        transform: translateY(-2px);
+      }
+
+      .btn:active {
+        background-color: #2471a3;
+        transform: translateY(0);
+      }
+
+      /* Specific styling for the predict button to stand out */
+      .btn-predict {
+        background-color: #2ecc71;
+      }
+
+      .btn-predict:hover {
+        background-color: #27ae60;
+      }
+
+      /* Style the form paragraphs (e.g., input fields) */
+      .form-group p {
+        text-align: left;
+        margin-bottom: 15px;
+      }
+
+      /* Styling for Django form input fields */
+      .form-group input[type="file"] {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="card">
+        <h1>Upload Model To Make Predictions</h1>
+        <form method="POST" enctype="multipart/form-data" class="form-group">
+          {% csrf_token %} {{ form.as_p }}
+          <button type="submit" class="btn">Upload model</button>
+        </form>
+        <hr />
+        <form action="{% url 'predict_next' %}" method="get" class="form-group">
+          <button type="submit" class="btn btn-predict">Predict</button>
+        </form>
+      </div>
+    </div>
+  </body>
+</html>

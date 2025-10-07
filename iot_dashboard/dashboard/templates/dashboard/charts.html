@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>IoT Sensor Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+        background: #f0f2f5;
+        color: #333;
+      }
+      h1 {
+        text-align: center;
+        color: #2c3e50;
+      }
+      p {
+        text-align: center;
+        font-size: 1.1em;
+        color: #555;
+      }
+      .chart-container {
+        width: 90%;
+        max-width: 900px;
+        margin: 40px auto;
+        padding: 20px;
+        background: #fff;
+        border-radius: 10px;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+      }
+      #alerts {
+        width: 90%;
+        max-width: 900px;
+        margin: 20px auto;
+        padding: 15px;
+        border-radius: 8px;
+        background: #fff3cd;
+        color: #856404;
+        border: 1px solid #ffeeba;
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>IoT Sensor Dashboard</h1>
+    <p>Latest daily sensor readings (last 20 days)</p>
+
+    <div id="alerts"></div>
+
+    <div class="chart-container">
+      <h2>Temperature (°C)</h2>
+      <canvas id="tempChart"></canvas>
+    </div>
+    <div class="chart-container">
+      <h2>Humidity (%)</h2>
+      <canvas id="humidityChart"></canvas>
+    </div>
+    <div class="chart-container">
+      <h2>Battery Voltage (V)</h2>
+      <canvas id="batteryChart"></canvas>
+    </div>
+    <div class="chart-container">
+      <h2>Motion Counts</h2>
+      <canvas id="motionChart"></canvas>
+    </div>
+
+    <script>
+      const channelId = "3077306";
+      const readApiKey = "RJKY2M6KAC4APH45";
+      const results = 8000;
+
+      const THRESHOLDS = {
+        temperature: 15,
+        humidity: 60,
+        battery: 3.0,
+      };
+
+      let tempChart, humidityChart, batteryChart, motionChart;
+
+      // Ask for browser notification permission
+      if ("Notification" in window) {
+        Notification.requestPermission();
+      }
+
+      async function fetchThingSpeakData() {
+        const url = `https://api.thingspeak.com/channels/${channelId}/feeds.json?api_key=${readApiKey}&results=${results}`;
+        const response = await fetch(url);
+        const data = await response.json();
+        return data.feeds;
+      }
+
+      function getLastNDaysData(feeds, nDays = 20) {
+        const grouped = {};
+        feeds.forEach((feed) => {
+          if (feed.created_at) {
+            const date = new Date(feed.created_at);
+            const day = date.toISOString().slice(0, 10);
+            if (!grouped[day]) grouped[day] = [];
+            grouped[day].push(feed);
+          }
+        });
+
+        const sortedDays = Object.keys(grouped).sort().slice(-nDays);
+        const timestamps = [];
+        const temperature = [];
+        const humidity = [];
+        const battery = [];
+        const motion = [];
+
+        sortedDays.forEach((day) => {
+          timestamps.push(day);
+          const lastEntry = grouped[day][grouped[day].length - 1];
+          temperature.push(parseFloat(lastEntry.field4) || 0);
+          humidity.push(parseFloat(lastEntry.field2) || 0);
+          battery.push(parseFloat(lastEntry.field1) || 0);
+          motion.push(parseInt(lastEntry.field3) || 0);
+        });
+
+        return { timestamps, temperature, humidity, battery, motion };
+      }
+
+      function createBarChart(
+        ctx,
+        label,
+        data,
+        bgColor,
+        borderColor,
+        yMin = 0,
+        yMax = null
+      ) {
+        return new Chart(ctx, {
+          type: "bar",
+          data: {
+            labels: data.timestamps,
+            datasets: [
+              {
+                label: label,
+                data: data.values,
+                backgroundColor: bgColor,
+                borderColor: borderColor,
+                borderWidth: 1,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            plugins: { legend: { display: true, position: "top" } },
+            scales: {
+              y: { beginAtZero: true, min: yMin, max: yMax },
+              x: { ticks: { autoSkip: false } },
+            },
+          },
+        });
+      }
+
+      function updateChart(chart, newLabels, newData) {
+        chart.data.labels = newLabels;
+        chart.data.datasets[0].data = newData;
+        chart.update();
+      }
+
+      function showAlert(message) {
+        const alertBox = document.getElementById("alerts");
+        alertBox.style.display = "block";
+        alertBox.innerHTML += `<p>⚠️ ${message}</p>`;
+        if (Notification.permission === "granted") {
+          new Notification("IoT Alert", { body: message });
+        }
+      }
+
+      function clearAlerts() {
+        const alertBox = document.getElementById("alerts");
+        alertBox.style.display = "none";
+        alertBox.innerHTML = "";
+      }
+
+      function checkThresholds(data) {
+        const latestIndex = data.timestamps.length - 1;
+        const temp = data.temperature[latestIndex];
+        const hum = data.humidity[latestIndex];
+        const bat = data.battery[latestIndex];
+
+        if (temp < THRESHOLDS.temperature)
+          showAlert(`Temperature is low: ${temp.toFixed(1)}°C`);
+        if (hum < THRESHOLDS.humidity)
+          showAlert(`Humidity is low: ${hum.toFixed(1)}%`);
+        if (bat < THRESHOLDS.battery)
+          showAlert(`Battery voltage is low: ${bat.toFixed(2)}V`);
+      }
+
+      async function renderCharts() {
+        clearAlerts();
+        const feeds = await fetchThingSpeakData();
+        const last20 = getLastNDaysData(feeds, 20);
+        checkThresholds(last20);
+
+        if (!tempChart) {
+          tempChart = createBarChart(
+            document.getElementById("tempChart"),
+            "Temperature (°C)",
+            { timestamps: last20.timestamps, values: last20.temperature },
+            "rgba(255,99,132,0.6)",
+            "rgba(255,99,132,1)",
+            0,
+            40
+          );
+          humidityChart = createBarChart(
+            document.getElementById("humidityChart"),
+            "Humidity (%)",
+            { timestamps: last20.timestamps, values: last20.humidity },
+            "rgba(54,162,235,0.6)",
+            "rgba(54,162,235,1)",
+            0,
+            100
+          );
+          batteryChart = createBarChart(
+            document.getElementById("batteryChart"),
+            "Battery Voltage (V)",
+            { timestamps: last20.timestamps, values: last20.battery },
+            "rgba(75,192,192,0.6)",
+            "rgba(75,192,192,1)",
+            0,
+            5
+          );
+          motionChart = createBarChart(
+            document.getElementById("motionChart"),
+            "Motion Counts",
+            { timestamps: last20.timestamps, values: last20.motion },
+            "rgba(255,206,86,0.6)",
+            "rgba(255,206,86,1)"
+          );
+        } else {
+          updateChart(tempChart, last20.timestamps, last20.temperature);
+          updateChart(humidityChart, last20.timestamps, last20.humidity);
+          updateChart(batteryChart, last20.timestamps, last20.battery);
+          updateChart(motionChart, last20.timestamps, last20.motion);
+        }
+      }
+
+      // Initial load
+      renderCharts();
+
+      // 🔁 Auto-refresh every 5 minutes (300000 ms)
+      setInterval(renderCharts, 300000);
+    </script>
+  </body>
+</html>

@@ -24,6 +24,7 @@ DEBUG = os.getenv("DJANGO_DEBUG", "True").lower() in ("1", "true", "yes")
 ALLOWED_HOSTS = [h.strip() for h in os.getenv("DJANGO_ALLOWED_HOSTS", "127.0.0.1,localhost","environmental-monitoring-system-production.up.railway.app").split(",") if h.strip()]
 CSRF_TRUSTED_ORIGINS = ['https://environmental-monitoring-system-production.up.railway.app']
 
+
 # Application definition
 INSTALLED_APPS = [
     "django.contrib.admin",

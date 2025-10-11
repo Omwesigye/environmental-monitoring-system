@@ -1,7 +1,9 @@
 # iot_dashboard/settings.py
 from pathlib import Path
+import dj_database_url # type: ignore
 import os
 from dotenv import load_dotenv
+
 
 # Load environment variables from a .env file (install python-dotenv)
 load_dotenv()
@@ -19,7 +21,8 @@ SECRET_KEY = os.getenv(
 DEBUG = os.getenv("DJANGO_DEBUG", "True").lower() in ("1", "true", "yes")
 
 # Comma-separated, e.g. "127.0.0.1,localhost,mydomain.com"
-ALLOWED_HOSTS = [h.strip() for h in os.getenv("DJANGO_ALLOWED_HOSTS", "127.0.0.1,localhost").split(",") if h.strip()]
+ALLOWED_HOSTS = [h.strip() for h in os.getenv("DJANGO_ALLOWED_HOSTS", "127.0.0.1,localhost","environmental-monitoring-system-production.up.railway.app").split(",") if h.strip()]
+CSRF_TRUSTED_ORIGINS = ['https://environmental-monitoring-system-production.up.railway.app']
 
 # Application definition
 INSTALLED_APPS = [
@@ -74,14 +77,20 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "iot_dashboard.wsgi.application"
+ENVIRONMENT = os.getenv("ENVIRONMENT", "development")
+POSTGRES_LOCALLY = os.getenv("POSTGRES_LOCALLY", "False").lower() == "false"
 
-# Database (simple sqlite for development)
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
         "NAME": BASE_DIR / "db.sqlite3",
     }
 }
+
+# Only use DATABASE_URL if in production
+if ENVIRONMENT == "production":
+    import dj_database_url # type: ignore
+    DATABASES["default"] = dj_database_url.parse(os.getenv("DATABASE_URL"))
 
 # Password validation (default Django validators)
 AUTH_PASSWORD_VALIDATORS = [

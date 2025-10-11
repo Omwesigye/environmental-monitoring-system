@@ -8,8 +8,11 @@
       href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap"
       rel="stylesheet"
     />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      rel="stylesheet"
+    />
     <style>
-      /* ---------- Global Layout ---------- */
       * {
         box-sizing: border-box;
         margin: 0;
@@ -19,15 +22,12 @@
       body {
         font-family: "Roboto", sans-serif;
         min-height: 100vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: blue;
-        position: relative;
-        overflow: hidden;
+        color: #fff;
+        background: #0b0c10;
+        overflow-x: hidden;
+        scroll-behavior: smooth;
       }
 
-      /* ---------- Animated Background ---------- */
       body::before {
         content: "";
         position: absolute;
@@ -35,11 +35,9 @@
         left: 0;
         width: 100%;
         height: 100%;
-        background: url("{% static 'img/bg.png' %}") no-repeat center center;
-        background-size: cover;
-        filter: blur(15px) brightness(0.6);
+        background: url("{% static 'img/pixels.jpg' %}") center/cover no-repeat;
+        filter: blur(2px) brightness(0.9);
         z-index: -2;
-        animation: bgMove 30s linear infinite;
       }
 
       body::after {
@@ -50,35 +48,89 @@
         width: 100%;
         height: 100%;
         background: linear-gradient(
-          135deg,
-          rgba(0, 123, 255, 0.3),
-          rgba(0, 210, 255, 0.3)
+          to right,
+          rgba(0, 0, 0, 0.6),
+          rgba(0, 0, 0, 0.3)
         );
         z-index: -1;
       }
 
-      @keyframes bgMove {
-        0% {
-          background-position: 0% 0%;
-        }
-        50% {
-          background-position: 100% 50%;
-        }
-        100% {
-          background-position: 0% 100%;
-        }
+      /* Sidebar */
+      .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 250px;
+        background: rgba(20, 20, 25, 0.95);
+        backdrop-filter: blur(5px);
+        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.4);
+        z-index: 100;
+        padding-top: 30px;
+        transition: width 0.3s ease;
       }
 
+      .sidebar h2 {
+        text-align: center;
+        margin-bottom: 30px;
+        font-size: 1.6rem;
+        color: #00f2fe;
+        letter-spacing: 1px;
+      }
+
+      .sidebar ul {
+        list-style: none;
+        padding: 0;
+      }
+
+      .sidebar ul li {
+        padding: 15px 25px;
+        margin: 10px 0;
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        border-radius: 10px;
+        transition: background 0.3s;
+      }
+
+      .sidebar ul li:hover {
+        background: linear-gradient(135deg, #00f2fe, #007bff);
+      }
+
+      .sidebar ul li i {
+        margin-right: 15px;
+        font-size: 1.3rem;
+      }
+
+      .sidebar ul li a {
+        text-decoration: none;
+        color: #fff;
+        font-size: 1.1rem;
+        width: 100%;
+        display: block;
+      }
+
+      /* Adjust main content */
+      .main-content {
+        margin-left: 250px;
+        padding: 20px;
+        position: relative;
+        z-index: 1;
+      }
+
+      /* Hero section */
       .wrapper {
         display: flex;
         align-items: center;
         justify-content: space-between;
         width: 90%;
         max-width: 1200px;
-        padding: 40px;
+        padding: 60px 40px;
+        margin: 0 auto;
+        position: relative;
+        flex-wrap: wrap;
       }
 
-      /* ---------- Text Section ---------- */
       .headline {
         flex: 1;
         padding-right: 40px;
@@ -88,53 +140,32 @@
         font-size: 3rem;
         line-height: 1.3;
         font-weight: 700;
+        color: #fff;
+        margin-bottom: 20px;
       }
 
       .headline-title span {
         display: block;
         font-size: 3.6rem;
-        background: linear-gradient(90deg, #0b8086, #071a2e);
-
+        background: linear-gradient(90deg, #00f2fe, #007bff);
+        -webkit-background-clip: text;
         background-clip: text;
-
+        color: transparent;
         margin-bottom: 15px;
       }
 
       .headline-title small {
-        font-size: 1.2rem;
+        font-size: 1.4rem;
         font-weight: 400;
-        color: white;
+        color: #f1f1f1;
       }
 
-      .buttons {
-        margin-top: 40px;
-      }
-
-      .btn {
-        display: inline-block;
-        background: linear-gradient(135deg, #00f2fe, #007bff);
-        color: #ffffff;
-        padding: 14px 28px;
-        border-radius: 12px;
-        text-decoration: none;
-        font-weight: bold;
-        font-size: 1.1rem;
-        margin-right: 20px;
-        box-shadow: 0 8px 18px rgba(0, 123, 255, 0.25);
-        transition: transform 0.3s, box-shadow 0.3s;
-      }
-
-      .btn:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 12px 24px rgba(0, 123, 255, 0.5);
-      }
-
-      /* ---------- Image / Graphic ---------- */
       .graphic {
         flex: 1;
         display: flex;
         justify-content: center;
         position: relative;
+        margin-top: 20px;
       }
 
       .circle-img {
@@ -143,38 +174,8 @@
         object-fit: cover;
         border-radius: 50%;
         border: 6px solid rgba(255, 255, 255, 0.7);
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
-        transition: transform 0.4s ease, box-shadow 0.4s ease;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
         animation: float 6s ease-in-out infinite;
-      }
-
-      .circle-img:hover {
-        transform: scale(1.05);
-        box-shadow: 0 14px 35px rgba(0, 0, 0, 0.35);
-      }
-
-      .ring {
-        position: absolute;
-        border: 2px solid rgba(255, 255, 255, 0.4);
-        border-radius: 50%;
-        width: 300px;
-        height: 300px;
-        animation: pulse 6s infinite;
-      }
-
-      @keyframes pulse {
-        0% {
-          transform: scale(0.9);
-          opacity: 0.7;
-        }
-        50% {
-          transform: scale(1.1);
-          opacity: 0.3;
-        }
-        100% {
-          transform: scale(0.9);
-          opacity: 0.7;
-        }
       }
 
       @keyframes float {
@@ -187,55 +188,188 @@
         }
       }
 
-      /* ---------- Responsive ---------- */
+      /* Live data section */
+      #live-data-section {
+        display: flex;
+        justify-content: space-evenly;
+        align-items: center;
+        gap: 40px;
+        flex-wrap: wrap;
+        position: fixed;
+        bottom: 40px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: calc(100% - 250px);
+        z-index: 10;
+        padding-left: 40px;
+      }
+
+      .sensor-box {
+        width: 180px;
+        height: 180px;
+        border-radius: 20px;
+        color: #fff;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        font-weight: bold;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
+        transition: transform 0.3s, box-shadow 0.3s;
+      }
+
+      .sensor-box:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 28px rgba(0, 0, 0, 0.7);
+      }
+
+      .sensor-box i {
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+      }
+
+      .sensor-box h2 {
+        font-size: 2rem;
+      }
+
+      .sensor-box p {
+        font-size: 1rem;
+        margin-top: 5px;
+        color: #ddd;
+      }
+
+      #temperature-box {
+        background: linear-gradient(135deg, #00f2fe, #007bff);
+      }
+
+      #humidity-box {
+        background: linear-gradient(135deg, #43e97b, #38f9d7);
+      }
+
+      #motion-box {
+        background: linear-gradient(135deg, #f7971e, #ffd200);
+      }
+
+      #battery-box {
+        background: linear-gradient(135deg, #f953c6, #b91d73);
+      }
+
       @media (max-width: 900px) {
-        .wrapper {
-          flex-direction: column;
-          text-align: center;
+        .sidebar {
+          width: 200px;
         }
-        .headline {
-          padding-right: 0;
+        .main-content {
+          margin-left: 200px;
         }
-        .graphic {
-          margin-top: 40px;
+        #live-data-section {
+          width: calc(100% - 200px);
         }
       }
 
       @media (max-width: 600px) {
-        .circle-img {
-          width: 200px;
-          height: 200px;
+        .sidebar {
+          display: none;
         }
-        .headline-title span {
-          font-size: 2.8rem;
+        .main-content {
+          margin-left: 0;
+        }
+        #live-data-section {
+          position: static;
+          transform: none;
+          margin-top: 30px;
         }
       }
     </style>
   </head>
 
   <body>
-    <div class="wrapper">
-      <div class="headline">
-        <h1 class="headline-title">
-          <span>Environmental Monitoring System</span>
-          <small
-            >Monitoring Temperature, Humidity, and Motion in Real-Time</small
-          >
-        </h1>
-        <div class="buttons">
-          <a href="/charts/" class="btn">📊 View Charts</a>
-          <a href="/ml/upload/" class="btn">🧠 Upload Model</a>
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <h2>IoT Dashboard</h2>
+      <ul>
+        <li>
+          <i class="fas fa-broadcast-tower"></i>
+          <a href="{% url 'view_live_data' %}">View Live Data</a>
+        </li>
+        <li>
+          <i class="fas fa-chart-line"></i>
+          <a href="/charts/">View Charts</a>
+        </li>
+        <li>
+          <i class="fas fa-brain"></i>
+          <a href="/ml/upload/">Upload Model</a>
+        </li>
+      </ul>
+    </div>
+
+    <div class="main-content">
+      <!-- Hero section -->
+      <div class="wrapper">
+        <div class="headline">
+          <h1 class="headline-title">
+            <span>Environmental Monitoring System</span>
+            <small
+              >Monitoring Temperature, Humidity, and Motion in Real-Time</small
+            >
+          </h1>
+        </div>
+
+        <div class="graphic">
+          <img
+            src="{% static 'img/image.png' %}"
+            alt="Environmental sensors"
+            class="circle-img"
+          />
         </div>
       </div>
 
-      <div class="graphic">
-        <img
-          src="{% static 'img/image.png' %}"
-          alt="Illustration of environmental monitoring sensors"
-          class="circle-img"
-        />
-        <div class="ring"></div>
-      </div>
+      <!-- Live Data Boxes -->
+      <section id="live-data-section">
+        <div id="temperature-box" class="sensor-box">
+          <i class="fas fa-thermometer-half"></i>
+          <h2 id="temperature">--</h2>
+          <p>Temperature</p>
+        </div>
+
+        <div id="humidity-box" class="sensor-box">
+          <i class="fas fa-tint"></i>
+          <h2 id="humidity">--</h2>
+          <p>Humidity</p>
+        </div>
+
+        <div id="motion-box" class="sensor-box">
+          <i class="fas fa-walking"></i>
+          <h2 id="motion">--</h2>
+          <p>Motion</p>
+        </div>
+
+        <div id="battery-box" class="sensor-box">
+          <i class="fas fa-battery-three-quarters"></i>
+          <h2 id="battery">--</h2>
+          <p>Battery</p>
+        </div>
+      </section>
     </div>
+
+    <script>
+      async function fetchSensorData() {
+        try {
+          const response = await fetch("/api/latest/");
+          const data = await response.json();
+          if (!data.error) {
+            document.getElementById("temperature").innerText = data.temperature;
+            document.getElementById("humidity").innerText = data.humidity;
+            document.getElementById("motion").innerText = data.motion;
+            document.getElementById("battery").innerText = data.battery;
+          }
+        } catch (err) {
+          console.error("Failed to fetch sensor data:", err);
+        }
+      }
+
+      fetchSensorData();
+      setInterval(fetchSensorData, 10000);
+    </script>
   </body>
 </html>

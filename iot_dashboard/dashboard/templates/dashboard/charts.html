@@ -4,40 +4,66 @@
     <meta charset="UTF-8" />
     <title>IoT Sensor Dashboard</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-matrix@1.2.0"></script>
     <style>
+      /* ======== GENERAL LAYOUT ======== */
       body {
-        font-family: Arial, sans-serif;
-        margin: 20px;
-        background: #f0f2f5;
-        color: #333;
+        font-family: "Poppins", sans-serif;
+        margin: 0;
+        background: linear-gradient(to bottom right, #e6f7ff, #cce7ff);
+        color: #1a2a33;
+        text-align: center;
+        min-height: 100vh;
       }
+
       h1 {
-        text-align: center;
-        color: #2c3e50;
+        color: #007acc;
+        margin-top: 30px;
       }
+
       p {
-        text-align: center;
+        color: #333;
         font-size: 1.1em;
-        color: #555;
       }
-      .chart-container {
+
+      /* ======== GRID CONTAINER ======== */
+      .dashboard-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+        gap: 30px;
         width: 90%;
-        max-width: 900px;
+        max-width: 1000px;
         margin: 40px auto;
-        padding: 20px;
-        background: #fff;
-        border-radius: 10px;
-        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
       }
+
+      /* ======== CHART CONTAINERS ======== */
+      .chart-container {
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 15px;
+        box-shadow: 0px 4px 12px rgba(0, 122, 204, 0.15);
+        padding: 20px;
+        transition: transform 0.3s ease;
+      }
+
+      .chart-container:hover {
+        transform: translateY(-4px);
+      }
+
+      .chart-container h2 {
+        color: #007acc;
+        margin-bottom: 15px;
+      }
+
+      /* ======== ALERT BOX ======== */
       #alerts {
         width: 90%;
         max-width: 900px;
         margin: 20px auto;
         padding: 15px;
         border-radius: 8px;
-        background: #fff3cd;
-        color: #856404;
-        border: 1px solid #ffeeba;
+        background: #e3f2fd;
+        border: 1px solid #90caf9;
+        color: #0d47a1;
         display: none;
       }
     </style>
@@ -48,21 +74,27 @@
 
     <div id="alerts"></div>
 
-    <div class="chart-container">
-      <h2>Temperature (°C)</h2>
-      <canvas id="tempChart"></canvas>
-    </div>
-    <div class="chart-container">
-      <h2>Humidity (%)</h2>
-      <canvas id="humidityChart"></canvas>
-    </div>
-    <div class="chart-container">
-      <h2>Battery Voltage (V)</h2>
-      <canvas id="batteryChart"></canvas>
-    </div>
-    <div class="chart-container">
-      <h2>Motion Counts</h2>
-      <canvas id="motionChart"></canvas>
+    <!-- ======== CHARTS IN GRID ======== -->
+    <div class="dashboard-grid">
+      <div class="chart-container">
+        <h2>Temperature (°C)</h2>
+        <canvas id="tempChart"></canvas>
+      </div>
+
+      <div class="chart-container">
+        <h2>Humidity (%)</h2>
+        <canvas id="humidityChart"></canvas>
+      </div>
+
+      <div class="chart-container">
+        <h2>Battery Voltage (V)</h2>
+        <canvas id="batteryChart"></canvas>
+      </div>
+
+      <div class="chart-container">
+        <h2>Motion Counts</h2>
+        <canvas id="motionChart"></canvas>
+      </div>
     </div>
 
     <script>
@@ -78,7 +110,6 @@
 
       let tempChart, humidityChart, batteryChart, motionChart;
 
-      // Ask for browser notification permission
       if ("Notification" in window) {
         Notification.requestPermission();
       }
@@ -200,8 +231,8 @@
             document.getElementById("tempChart"),
             "Temperature (°C)",
             { timestamps: last20.timestamps, values: last20.temperature },
-            "rgba(255,99,132,0.6)",
-            "rgba(255,99,132,1)",
+            "rgba(0,150,255,0.6)",
+            "rgba(0,150,255,1)",
             0,
             40
           );
@@ -209,8 +240,8 @@
             document.getElementById("humidityChart"),
             "Humidity (%)",
             { timestamps: last20.timestamps, values: last20.humidity },
-            "rgba(54,162,235,0.6)",
-            "rgba(54,162,235,1)",
+            "rgba(0,200,255,0.6)",
+            "rgba(0,200,255,1)",
             0,
             100
           );
@@ -218,8 +249,8 @@
             document.getElementById("batteryChart"),
             "Battery Voltage (V)",
             { timestamps: last20.timestamps, values: last20.battery },
-            "rgba(75,192,192,0.6)",
-            "rgba(75,192,192,1)",
+            "rgba(0,180,255,0.6)",
+            "rgba(0,180,255,1)",
             0,
             5
           );
@@ -227,8 +258,8 @@
             document.getElementById("motionChart"),
             "Motion Counts",
             { timestamps: last20.timestamps, values: last20.motion },
-            "rgba(255,206,86,0.6)",
-            "rgba(255,206,86,1)"
+            "rgba(100,220,255,0.6)",
+            "rgba(100,220,255,1)"
           );
         } else {
           updateChart(tempChart, last20.timestamps, last20.temperature);
@@ -238,11 +269,10 @@
         }
       }
 
-      // Initial load
+      // ======== INITIALIZE ========
       renderCharts();
-
-      // 🔁 Auto-refresh every 5 minutes (300000 ms)
-      setInterval(renderCharts, 300000);
+      setInterval(renderCharts, 30000); // refresh every
     </script>
+    <a href="{% url 'landing' %}" class="back-btn">← Back to Landing Page</a>
   </body>
 </html>

@@ -1,0 +1,106 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta http-equiv="refresh" content="10" />
+
+    <meta charset="UTF-8" />
+    <title>Live Sensor Data</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f0f2f5;
+        margin: 0;
+        padding: 40px;
+        text-align: center;
+      }
+
+      h1 {
+        color: #007bff;
+        margin-bottom: 20px;
+      }
+
+      .table-container {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        max-width: 900px;
+        margin: 0 auto;
+        overflow-x: auto;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+      }
+
+      th,
+      td {
+        padding: 12px;
+        border-bottom: 1px solid #ddd;
+        text-align: center;
+      }
+
+      th {
+        background-color: #007bff;
+        color: white;
+      }
+
+      tr:hover {
+        background-color: #f1f1f1;
+      }
+
+      .back-btn {
+        display: inline-block;
+        margin-top: 25px;
+        background-color: #28a745;
+        color: white;
+        padding: 12px 25px;
+        border-radius: 8px;
+        text-decoration: none;
+        transition: background-color 0.3s ease;
+      }
+
+      .back-btn:hover {
+        background-color: #218838;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Live Sensor Data (Last 10 Readings)</h1>
+
+    <div class="table-container">
+      <table>
+        <tr>
+          <th>#</th>
+          <th>Timestamp</th>
+          <th>Battery (V)</th>
+          <th>Humidity (%)</th>
+          <th>Motion</th>
+          <th>Temperature (°C)</th>
+        </tr>
+        {% for item in recent_readings %}
+        <tr>
+          <td>{{ forloop.counter }}</td>
+          <td>{{ item.timestamp }}</td>
+          <td>{{ item.battery }}</td>
+          <td>{{ item.humidity }}</td>
+          <td>{{ item.motion }}</td>
+          <td>{{ item.temperature }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="6">No recent sensor readings available.</td>
+        </tr>
+        {% endfor %}
+      </table>
+    </div>
+
+    <!-- Back to landing page button -->
+    <a href="{% url 'landing' %}" class="back-btn">← Back to Landing Page</a>
+
+    >
+  </body>
+</html>

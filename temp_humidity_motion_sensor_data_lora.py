@@ -11,7 +11,16 @@ from dotenv import load_dotenv
 
 
 load_dotenv()
+broker = "eu1.cloud.thethings.network"
+port = 1883
+username = os.getenv("TTN_USERNAME", "bd-test-app2")
+password = os.getenv("TTN_API_KEY", "NNSXS.NGFSXX4UXDX55XRIDQZS6LPR4OJXKIIGSZS56CQ.6O4WUAUHFUAHSTEYRWJX6DDO7TL2IBLC7EV2LS4EHWZOOEPCEUOA")
+device_id = "lht65n-01-temp-humidity-sensor"
 
+thingspeak_channel_id = os.getenv("THINGSPEAK_CHANNEL_ID", "3077306")
+thingspeak_write_api_key = os.getenv("THINGSPEAK_WRITE_API_KEY", "JTOW7IQ7BDQBUGR6")
+thingspeak_read_api_key = os.getenv("THINGSPEAK_READ_API_KEY", "RJKY2M6KAC4APH45")
+csv_file = "sensor_data.csv"
 
 
 
@@ -226,14 +235,14 @@ if __name__ == "__main__":
     mqtt_thread.start()
 
     # Schedule tasks
-    schedule.every().day.at("12:00").do(get_historical_and_upload)
-    schedule.every().day.at("12:00").do(update_csv_from_thingspeak)
+    schedule.every().day.at("16:00").do(get_historical_and_upload)
+    schedule.every().day.at("16:00").do(update_csv_from_thingspeak)
     
 
     # Run missed tasks if within 30 minutes of schedule
     current_time = datetime.now().time()
-    scheduled_time = datetime.strptime("12:00", "%H:%M").time()
-    if scheduled_time <= current_time <= datetime.strptime("12:00", "%H:%M").time():
+    scheduled_time = datetime.strptime("16:00", "%H:%M").time()
+    if scheduled_time <= current_time <= datetime.strptime("16:00", "%H:%M").time():
         print("Running missed historical fetch and CSV update…")
         get_historical_and_upload()
         update_csv_from_thingspeak()

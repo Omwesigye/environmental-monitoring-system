@@ -2,11 +2,11 @@
 from pathlib import Path
 import dj_database_url # type: ignore
 import os
-from dotenv import load_dotenv
+# from dotenv import load_dotenv
 
 
 # Load environment variables from a .env file (install python-dotenv)
-load_dotenv()
+# load_dotenv()
 
 # Base directory
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -18,11 +18,20 @@ SECRET_KEY = os.getenv(
     "django-insecure-replace-this-in-production"  # fallback for dev only
 )
 
-DEBUG = os.getenv("DJANGO_DEBUG", "True").lower() in ("1", "true", "yes")
+# DEBUG = os.getenv("DJANGO_DEBUG", "True").lower() in ("1", "true", "yes")
+# Detect Railway environment
+RAILWAY_ENV = 'RAILWAY' in os.environ
+
+# Set DEBUG based on environment
+DEBUG = os.getenv("DJANGO_DEBUG", "True").lower() in ("1", "true", "yes") and not RAILWAY_ENV
 
 # Comma-separated, e.g. "127.0.0.1,localhost,mydomain.com"
-ALLOWED_HOSTS = [h.strip() for h in os.getenv("DJANGO_ALLOWED_HOSTS", "127.0.0.1,localhost","environmental-monitoring-system-production.up.railway.app").split(",") if h.strip()]
-CSRF_TRUSTED_ORIGINS = ['https://environmental-monitoring-system-production.up.railway.app']
+# ALLOWED_HOSTS = [h.strip() for h in os.getenv("DJANGO_ALLOWED_HOSTS", "127.0.0.1,localhost","environmental-monitoring-system-production.up.railway.app").split(",") if h.strip()]
+ALLOWED_HOSTS = [h.strip() for h in os.getenv("DJANGO_ALLOWED_HOSTS", "127.0.0.1,localhost").split(",") if h.strip()]
+# CSRF_TRUSTED_ORIGINS = ['https://environmental-monitoring-system-production.up.railway.app']
+
+if RAILWAY_ENV:
+    ALLOWED_HOSTS.extend(['.railway.app', 'localhost', '127.0.0.1'])
 
 
 # Application definition
@@ -46,7 +55,7 @@ MIDDLEWARE = [
     # If you want to serve static files in production directly from Django,
     # consider using WhiteNoise. Uncomment below after installing whitenoise.
     # "whitenoise.middleware.WhiteNoiseMiddleware",
-
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -78,8 +87,8 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "iot_dashboard.wsgi.application"
-ENVIRONMENT = os.getenv("ENVIRONMENT", "development")
-POSTGRES_LOCALLY = os.getenv("POSTGRES_LOCALLY", "False").lower() == "false"
+# ENVIRONMENT = os.getenv("ENVIRONMENT", "development")
+# POSTGRES_LOCALLY = os.getenv("POSTGRES_LOCALLY", "False").lower() == "false"
 
 DATABASES = {
     "default": {
@@ -89,9 +98,9 @@ DATABASES = {
 }
 
 # Only use DATABASE_URL if in production
-if ENVIRONMENT == "production":
-    import dj_database_url # type: ignore
-    DATABASES["default"] = dj_database_url.parse(os.getenv("DATABASE_URL"))
+# if ENVIRONMENT == "production":
+#     import dj_database_url # type: ignore
+#     DATABASES["default"] = dj_database_url.parse(os.getenv("DATABASE_URL"))
 
 # Password validation (default Django validators)
 AUTH_PASSWORD_VALIDATORS = [
@@ -116,6 +125,9 @@ STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"           # collectstatic target
 STATICFILES_DIRS = [BASE_DIR / "static"]         # dev static files
 
+# Add WhiteNoise static files configuration
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
@@ -139,3 +151,12 @@ if not DEBUG:
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# Railway-specific settings
+if RAILWAY_ENV:
+    # Ensure DEBUG is False on Railway
+    DEBUG = False
+    # Security settings for production
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True

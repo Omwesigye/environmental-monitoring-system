@@ -31,7 +31,7 @@ ALLOWED_HOSTS = [h.strip() for h in os.getenv("DJANGO_ALLOWED_HOSTS", "127.0.0.1
 # CSRF_TRUSTED_ORIGINS = ['https://environmental-monitoring-system-production.up.railway.app']
 
 if RAILWAY_ENV:
-    ALLOWED_HOSTS.extend(['environmental-monitoring-system-production-3f35.up.railway.app','.railway.app', 'localhost', '127.0.0.1'])
+    ALLOWED_HOSTS.extend(['environmental-monitoring-system-production-3f35.up.railway.app', 'localhost', '127.0.0.1'])
 
 
 

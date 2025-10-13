@@ -9,7 +9,6 @@ from ml.model_store import rf  # import global model from your ml app
 THINGSPEAK_CHANNEL_ID = os.getenv("THINGSPEAK_CHANNEL_ID", "3077306")
 THINGSPEAK_READ_API_KEY = os.getenv("THINGSPEAK_READ_API_KEY", "RJKY2M6KAC4APH45")
 
-
 # ---------- Landing Page ----------
 def landing(request):
     """
@@ -62,11 +61,9 @@ def landing(request):
         "auto_error": auto_error,
     })
 
-
 # ---------- Charts Page ----------
 def charts(request):
     return render(request, "dashboard/charts.html")
-
 
 # ---------- Latest Sensor Data API ----------
 def latest_sensor_data(request):
@@ -96,3 +93,41 @@ def latest_sensor_data(request):
 
     except Exception as e:
         return JsonResponse({"error": str(e)})
+
+# ---------- Live Data Page ----------
+def view_live_data(request):
+    """
+    Fetch last 10 readings from ThingSpeak and render live_data.html
+    """
+    url = f"https://api.thingspeak.com/channels/{THINGSPEAK_CHANNEL_ID}/feeds.json"
+    params = {"api_key": THINGSPEAK_READ_API_KEY, "results": 10}
+
+    try:
+        response = requests.get(url, params=params, timeout=10)
+        response.raise_for_status()
+        feeds = response.json().get("feeds", [])
+
+        recent_readings = []
+        for feed in feeds:
+            dt_utc = datetime.strptime(feed["created_at"], "%Y-%m-%dT%H:%M:%SZ")
+            dt_uganda = dt_utc + timedelta(hours=3)
+            timestamp = dt_uganda.isoformat() + "+03:00"
+            reading = {
+                "timestamp": timestamp,
+                "battery": float(feed.get("field1", 0)),
+                "humidity": float(feed.get("field2", 0)),
+                "motion": int(feed.get("field3", 0)) if feed.get("field3") else 0,
+                "temperature": float(feed.get("field4", 0)),
+            }
+            recent_readings.append(reading)
+
+        # Reverse to show newest first
+        recent_readings = list(reversed(recent_readings))
+
+        return render(request, "live_data.html", {"recent_readings": recent_readings})
+
+    except Exception as e:
+        return render(request, "live_data.html", {
+            "recent_readings": [],
+            "error": f"Failed to fetch data: {str(e)}"
+        })

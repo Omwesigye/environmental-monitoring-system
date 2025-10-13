@@ -1,109 +1,150 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>Predict Next Sensor Reading</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Predict Next Readings</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
     <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
       body {
-        font-family: Arial, sans-serif;
-        background-color: #f0f2f5;
+        font-family: "Roboto", sans-serif;
+        background: #f0f4f8;
+        color: #333;
+        min-height: 100vh;
         display: flex;
         justify-content: center;
         align-items: center;
-        min-height: 100vh;
-        margin: 0;
+        padding: 20px;
       }
 
       .container {
-        background-color: #ffffff;
+        background: #fff;
         padding: 40px;
-        border-radius: 12px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-        width: 100%;
+        border-radius: 15px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
         max-width: 500px;
+        width: 100%;
         text-align: center;
       }
 
       h1 {
-        color: #333;
-        margin-bottom: 20px;
-        font-size: 2em;
+        margin-bottom: 30px;
+        font-size: 2rem;
+        color: #007bff;
       }
 
       form {
-        margin-top: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        align-items: center;
       }
 
-      /* Style for Django form paragraphs */
-      form p {
-        text-align: left;
-        margin-bottom: 15px;
-      }
-
-      /* Style for input and select fields */
-      input[type="text"],
-      input[type="number"],
-      input[type="password"],
-      input[type="email"],
-      select,
-      textarea {
+      label {
+        font-weight: bold;
+        margin-bottom: 5px;
+        color: #333;
         width: 100%;
-        padding: 12px;
-        border: 1px solid #ddd;
-        border-radius: 8px;
-        box-sizing: border-box;
-        transition: border-color 0.3s ease;
+        text-align: left;
       }
 
-      input[type="text"]:focus,
-      input[type="number"]:focus,
-      select:focus,
-      textarea:focus {
-        border-color: #007bff;
+      input[type="number"] {
+        padding: 10px 15px;
+        border-radius: 8px;
+        border: 1px solid #ccc;
         outline: none;
+        font-size: 1rem;
+        width: 100%;
+        max-width: 300px;
+      }
+
+      input[type="number"]:focus {
+        border-color: #007bff;
+        box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
       }
 
       button {
-        background-color: #007bff;
-        color: white;
-        padding: 15px 30px;
+        padding: 12px 30px;
         border: none;
         border-radius: 8px;
-        font-size: 1.1em;
+        background: #007bff;
+        color: #fff;
+        font-size: 1.1rem;
+        font-weight: bold;
         cursor: pointer;
-        transition: background-color 0.3s ease, transform 0.2s ease;
+        transition: all 0.3s;
         width: 100%;
-        margin-top: 20px;
+        max-width: 300px;
       }
 
       button:hover {
-        background-color: #0056b3;
+        background: #0056b3;
         transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
       }
 
-      .prediction-results {
-        margin-top: 30px;
+      .prediction {
+        margin-top: 20px;
         padding: 20px;
-        border-radius: 8px;
-        background-color: #e9ecef;
-        text-align: left;
+        background: #e6f0ff;
+        border-radius: 12px;
+        box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.05);
       }
 
-      .prediction-results p {
-        margin: 5px 0;
-        font-size: 1.1em;
-        color: #333;
+      .prediction h3 {
+        margin: 10px 0;
+        font-size: 1.2rem;
+        color: #007bff;
       }
 
-      .error-message {
-        color: #dc3545;
+      .error {
+        color: #d9534f;
         font-weight: bold;
+        margin: 10px 0;
+      }
+
+      .back-btn {
+        display: inline-block;
+        margin-top: 20px;
+        background-color: #28a745;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 8px;
+        text-decoration: none;
+        transition: background-color 0.3s ease;
+      }
+
+      .back-btn:hover {
+        background-color: #218838;
+      }
+
+      @media (max-width: 600px) {
+        .container {
+          padding: 20px;
+        }
+        h1 {
+          font-size: 1.5rem;
+        }
+        button {
+          font-size: 1rem;
+        }
       }
     </style>
   </head>
+
   <body>
     <div class="container">
-      <h1>Predict Next Sensor Reading</h1>
+      <h1>Predict Next Readings</h1>
 
       <form method="POST">
         {% csrf_token %} {{ form.as_p }}
@@ -111,16 +152,17 @@
       </form>
 
       {% if prediction %}
-      <div class="prediction-results">
+      <div class="prediction">
         {% if prediction.error %}
-        <p class="error-message">{{ prediction.error }}</p>
+        <p class="error">{{ prediction.error }}</p>
         {% else %}
-        <p>Predicted Temperature: <strong>{{ prediction.temp }} °C</strong></p>
-        <p>Predicted Humidity: <strong>{{ prediction.hum }} %</strong></p>
+        <h3>Predicted Temperature: {{ prediction.temp }} °C</h3>
+        <h3>Predicted Humidity: {{ prediction.hum }} %</h3>
         {% endif %}
       </div>
       {% endif %}
+
+      <a href="{% url 'landing' %}" class="back-btn">← Back to Landing Page</a>
     </div>
-     <a href="{% url 'landing' %}" class="back-btn">← Back to Landing Page</a>
   </body>
 </html>

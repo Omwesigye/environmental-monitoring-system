@@ -1,8 +1,6 @@
 from django.urls import path
-from .views import predict_next, upload_model, view_live_data  # import the new view
+from . import views
 
 urlpatterns = [
-    path("predict/", predict_next, name="predict_next"),
-    path("upload/", upload_model, name="upload_model"),
-    path("live-data/", view_live_data, name="view_live_data"),  # new live data URL
+    path('predict/', views.predict_next, name='predict_next'),
 ]

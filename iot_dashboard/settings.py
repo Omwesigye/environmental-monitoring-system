@@ -20,7 +20,7 @@ SECRET_KEY = os.getenv(
 
 # DEBUG = os.getenv("DJANGO_DEBUG", "True").lower() in ("1", "true", "yes")
 # Detect Railway environment
-RAILWAY_ENV = 'RAILWAY' in os.environ
+RAILWAY_ENV = 'RAILWAY_ENVIRONMENT' in os.environ
 
 # Set DEBUG based on environment
 DEBUG = os.getenv("DJANGO_DEBUG", "True").lower() in ("1", "true", "yes") and not RAILWAY_ENV

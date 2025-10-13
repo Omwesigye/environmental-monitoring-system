@@ -150,6 +150,7 @@ REST_FRAMEWORK = {
 # Security-related toggles (simple)
 if not DEBUG:
     # In production set these env vars appropriately.
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
     SECURE_SSL_REDIRECT = os.getenv("DJANGO_SECURE_SSL_REDIRECT", "True").lower() in ("1","true","yes")
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
@@ -162,6 +163,7 @@ if RAILWAY_ENV:
     # Ensure DEBUG is False on Railway
     DEBUG = False
     # Security settings for production
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
     SECURE_SSL_REDIRECT = True
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True

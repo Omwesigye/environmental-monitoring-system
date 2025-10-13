@@ -20,25 +20,22 @@ SECRET_KEY = os.getenv(
 
 # DEBUG = os.getenv("DJANGO_DEBUG", "True").lower() in ("1", "true", "yes")
 # Detect Railway environment
-RAILWAY_ENV = 'RAILWAY' in os.environ
+RAILWAY_ENV = 'RAILWAY' in os.environ or 'RAILWAY_ENVIRONMENT' in os.environ
 
 # Set DEBUG based on environment
 DEBUG = os.getenv("DJANGO_DEBUG", "True").lower() in ("1", "true", "yes") and not RAILWAY_ENV
 
 # Comma-separated, e.g. "127.0.0.1,localhost,mydomain.com"
-# ALLOWED_HOSTS = [h.strip() for h in os.getenv("DJANGO_ALLOWED_HOSTS", "127.0.0.1,localhost","environmental-monitoring-system-production.up.railway.app").split(",") if h.strip()]
+
 ALLOWED_HOSTS = [h.strip() for h in os.getenv("DJANGO_ALLOWED_HOSTS", "127.0.0.1,localhost").split(",") if h.strip()]
-# CSRF_TRUSTED_ORIGINS = ['https://environmental-monitoring-system-production.up.railway.app']
+
 
 # if RAILWAY_ENV:
 #     ALLOWED_HOSTS.extend(['environmental-monitoring.up.railway.app','.railway.app' 'localhost', '127.0.0.1'])
 if RAILWAY_ENV:
-    ALLOWED_HOSTS.extend([
-        'environmental-monitoring.up.railway.app',
-        '.railway.app',
-        'localhost',
-        '127.0.0.1'
-    ])
+    ALLOWED_HOSTS.append('environmental-monitoring.up.railway.app')
+else:
+    ALLOWED_HOSTS.extend(['localhost', '127.0.0.1'])
 
 
 

@@ -27,11 +27,28 @@ DEBUG = os.getenv("DJANGO_DEBUG", "True").lower() in ("1", "true", "yes") and no
 
 # Comma-separated, e.g. "127.0.0.1,localhost,mydomain.com"
 # ALLOWED_HOSTS = [h.strip() for h in os.getenv("DJANGO_ALLOWED_HOSTS", "127.0.0.1,localhost","environmental-monitoring-system-production.up.railway.app").split(",") if h.strip()]
-ALLOWED_HOSTS = [h.strip() for h in os.getenv("DJANGO_ALLOWED_HOSTS", "127.0.0.1,localhost").split(",") if h.strip()]
+
+ALLOWED_HOSTS = [h.strip() for h in os.getenv(
+    "DJANGO_ALLOWED_HOSTS",
+    "127.0.0.1,localhost"
+).split(",") if h.strip()]
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://environmental-monitoring.up.railway.app",
+    "https://*.railway.app"
+]
+
 # CSRF_TRUSTED_ORIGINS = ['https://environmental-monitoring-system-production.up.railway.app']
 
+# if RAILWAY_ENV:
+#     ALLOWED_HOSTS.extend(['environmental-monitoring.up.railway.app','.railway.app' 'localhost', '127.0.0.1'])
 if RAILWAY_ENV:
-    ALLOWED_HOSTS.extend(['environmental-monitoring.up.railway.app','.railway.app' 'localhost', '127.0.0.1'])
+    ALLOWED_HOSTS.extend([
+        'environmental-monitoring.up.railway.app',
+        '.railway.app',
+        'localhost',
+        '127.0.0.1'
+    ])
 
 
 

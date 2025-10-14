@@ -233,28 +233,20 @@ def run_mqtt_with_restart():
 if __name__ == "__main__":
     mqtt_thread = threading.Thread(target=run_mqtt_with_restart)
     mqtt_thread.start()
-    
-    print("MQTT worker started… heartbeat every 60s")
-    
-    
 
     # Schedule tasks
     schedule.every().day.at("16:00").do(get_historical_and_upload)
     schedule.every().day.at("16:00").do(update_csv_from_thingspeak)
     
+
+    # Run missed tasks if within 30 minutes of schedule
+    current_time = datetime.now().time()
+    scheduled_time = datetime.strptime("16:00", "%H:%M").time()
+    if scheduled_time <= current_time <= datetime.strptime("16:00", "%H:%M").time():
+        print("Running missed historical fetch and CSV update…")
+        get_historical_and_upload()
+        update_csv_from_thingspeak()
+
     while True:
         schedule.run_pending()
-        time.sleep(60)
-        print(f"[{datetime.utcnow().isoformat()}] Worker running…")
-    
-    # Run missed tasks if within 30 minutes of schedule
-   # current_time = datetime.now().time()
-   # scheduled_time = datetime.strptime("16:00", "%H:%M").time()
-    #if scheduled_time <= current_time <= datetime.strptime("16:00", "%H:%M").time():
-     #   print("Running missed historical fetch and CSV update…")
-      #  get_historical_and_upload()
-       # update_csv_from_thingspeak()
-
-#while True:
-  #      schedule.run_pending()
-   #     time.sleep(1)
+        time.sleep(1)

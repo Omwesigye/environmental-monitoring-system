@@ -10,7 +10,7 @@ import pandas as pd
 from dotenv import load_dotenv
 
 
-load_dotenv()
+#load_dotenv()
 broker = "eu1.cloud.thethings.network"
 port = 1883
 username = os.getenv("TTN_USERNAME", "bd-test-app2")
@@ -240,12 +240,12 @@ if __name__ == "__main__":
     
 
     # Run missed tasks if within 30 minutes of schedule
-    current_time = datetime.now().time()
-    scheduled_time = datetime.strptime("16:00", "%H:%M").time()
-    if scheduled_time <= current_time <= datetime.strptime("16:00", "%H:%M").time():
-        print("Running missed historical fetch and CSV update…")
-        get_historical_and_upload()
-        update_csv_from_thingspeak()
+   # current_time = datetime.now().time()
+   # scheduled_time = datetime.strptime("16:00", "%H:%M").time()
+    #if scheduled_time <= current_time <= datetime.strptime("16:00", "%H:%M").time():
+     #   print("Running missed historical fetch and CSV update…")
+      #  get_historical_and_upload()
+       # update_csv_from_thingspeak()
 
     while True:
         schedule.run_pending()

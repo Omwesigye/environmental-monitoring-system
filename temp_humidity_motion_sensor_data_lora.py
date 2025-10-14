@@ -233,6 +233,14 @@ def run_mqtt_with_restart():
 if __name__ == "__main__":
     mqtt_thread = threading.Thread(target=run_mqtt_with_restart)
     mqtt_thread.start()
+    
+    def heartbeat_thread():
+        while True:
+            print(f"[Heartbeat] MQTT worker is alive: {datetime.utcnow().isoformat()}Z")
+            time.sleep(60)
+
+    threading.Thread(target=heartbeat_thread, daemon=True).start()
+    
 
     # Schedule tasks
     schedule.every().day.at("16:00").do(get_historical_and_upload)
